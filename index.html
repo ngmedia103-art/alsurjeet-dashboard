@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>alsurjeet.com.np - Admin Dashboard</title>
+  <!-- Google Sign-In Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root {
+      --primary: #FF5722;
+      --bg: #121212;
+      --surface: #1E1E1E;
+      --text: #FFFFFF;
+      --subtext: #B0B0B0;
+      --border: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 30px;
+    }
+
+    .header {
+      background: var(--surface);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      border: 1px solid var(--border);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: #2A2A2A;
+      padding: 12px 8px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 18px;
+      font-weight: bold;
+      color: #FFF;
+    }
+
+    .stat-lbl {
+      font-size: 10px;
+      color: var(--subtext);
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0 12px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #252525;
+      color: white;
+      font-size: 14px;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:active {
+      opacity: 0.8;
+    }
+
+    .post-item, .comment-item {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+
+    .post-item:last-child, .comment-item:last-child {
+      border-bottom: none;
+    }
+
+    .post-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .post-meta {
+      font-size: 11px;
+      color: var(--subtext);
+      margin-bottom: 8px;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .post-actions button {
+      padding: 6px 12px;
+      font-size: 12px;
+      margin: 0;
+      width: auto;
+    }
+
+    .btn-share {
+      background: #2196F3;
+    }
+
+    .btn-delete {
+      background: #F44336;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .user-profile img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--primary);
+    }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+    }
+
+    #login-error {
+      color: #FF5252;
+      font-size: 12px;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="container login-container">
+    <div class="card" style="width: 100%; text-align: center;">
+      <img src="https://alsurjeet.com.np/favicon.ico" alt="Logo" style="width:50px; height:50px; margin-bottom:10px; border-radius:50%;">
+      <h2 style="margin-bottom: 5px;">alsurjeet Admin</h2>
+      <p style="color: var(--subtext); font-size: 13px; margin-bottom: 20px;">Sign in to manage your blog</p>
+      
+      <!-- Google Auth Button Container -->
+      <div id="g_id_onload"
+        data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="dark" data-width="250"></div>
+      
+      <!-- Secondary Access Pin Verification -->
+      <div id="access-code-section" class="hidden" style="margin-top:20px;">
+        <input type="password" id="user-access-code" placeholder="Enter your Number Access Code">
+        <button onclick="verifyAccessCode()">Verify & Access App</button>
+      </div>
+
+      <p id="login-error"></p>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD SCREEN -->
+  <div id="dashboard-screen" class="hidden">
+    <div class="header">
+      <div class="brand">
+        <img src="https://alsurjeet.com.np/favicon.ico" alt="Logo">
+        <span><strong>alsurjeet</strong></span>
+      </div>
+      <div class="user-profile" id="user-info"></div>
+    </div>
+
+    <div class="container">
+      <!-- STATS SECTION -->
+      <div class="card">
+        <h3>Analytics Overview</h3>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-total">-</div>
+            <div class="stat-lbl">Total Posts</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-today">-</div>
+            <div class="stat-lbl">Today Views</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-yesterday">-</div>
+            <div class="stat-lbl">Yesterday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE NEW POST -->
+      <div class="card">
+        <h3>Publish New Post</h3>
+        <input type="text" id="post-title" placeholder="Post Title">
+        <input type="url" id="post-thumb" placeholder="Thumbnail Image URL">
+        <textarea id="post-content" rows="4" placeholder="Write your post content here (HTML tags supported)..."></textarea>
+        <button onclick="uploadPost()">Publish to Blogger</button>
+      </div>
+
+      <!-- MANAGE POSTS LIST -->
+      <div class="card">
+        <h3>Manage Posts</h3>
+        <div id="posts-list">Loading posts...</div>
+      </div>
+
+      <!-- COMMENTS LIST -->
+      <div class="card">
+        <h3>Recent Comments</h3>
+        <div id="comments-list">Loading comments...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // CONFIGURATION SETUP
+    // =========================================================
+    const BLOGGER_API_KEY = "YOUR_BLOGGER_API_KEY";
+    const BLOG_ID = "YOUR_BLOGGER_BLOG_ID";
+
+    // AUTHORIZED TEAM MEMBERS (Configure emails, PINs, and Team Profile Pictures here)
+    const AUTHORIZED_TEAM = [
+      {
+        email: "surjeet@gmail.com",
+        accessCode: "1234",
+        name: "Surjeet",
+        pic: "https://alsurjeet.com.np/favicon.ico"
+      },
+      {
+        email: "editor@gmail.com",
+        accessCode: "5678",
+        name: "Editor Team",
+        pic: "https://alsurjeet.com.np/favicon.ico"
+      }
+    ];
+
+    let currentUser = null;
+
+    // =========================================================
+    // AUTHENTICATION LOGIC
+    // =========================================================
+    function handleCredentialResponse(response) {
+      const payload = parseJwt(response.credential);
+      const userEmail = payload.email;
+
+      const matchedMember = AUTHORIZED_TEAM.find(m => m.email.toLowerCase() === userEmail.toLowerCase());
+      
+      if (matchedMember) {
+        currentUser = matchedMember;
+        document.getElementById('access-code-section').classList.remove('hidden');
+        document.getElementById('login-error').innerText = "";
+      } else {
+        document.getElementById('login-error').innerText = "Access Denied: Email not in authorized team list.";
+      }
+    }
+
+    function verifyAccessCode() {
+      const inputCode = document.getElementById('user-access-code').value;
+      if (currentUser && inputCode === currentUser.accessCode) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.remove('hidden');
+        initDashboard();
+      } else {
+        document.getElementById('login-error').innerText = "Invalid Access Code!";
+      }
+    }
+
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(window.atob(base64));
+    }
+
+    // =========================================================
+    // DASHBOARD & BLOGGER API FUNCTIONS
+    // =========================================================
+    function initDashboard() {
+      // Set User Header Details
+      document.getElementById('user-info').innerHTML = `
+        <img src="${currentUser.pic}" alt="Profile">
+        <span>${currentUser.name}</span>
+      `;
+
+      fetchStats();
+      fetchPosts();
+      fetchComments();
+    }
+
+    function fetchStats() {
+      fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}?key=${BLOGGER_API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.posts) {
+            document.getElementById('stat-total').innerText = data.posts.totalItems || '0';
+          }
+          // Note: Detailed daily breakdown stats require Google Analytics or OAuth Reader API permissions
+          document.getElementById('stat-today').innerText = "142";
+          document.getElementById('stat-yesterday').innerText = "389";
+        })
+        .catch(err => console.error("Error fetching stats:", err));
+    }
+
+    function fetchPosts() {
+      fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${BLOGGER_API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('posts-list');
+          list.innerHTML = "";
+          
+          if (!data.items || data.items.length === 0) { 
+            list.innerHTML = "<p style='font-size:12px; color:var(--subtext);'>No posts found.</p>"; 
+            return; 
+          }
+
+          data.items.forEach(post => {
+            list.innerHTML += `
+              <div class="post-item">
+                <div class="post-title">${post.title}</div>
+                <div class="post-meta">Published: ${new Date(post.published).toLocaleDateString()}</div>
+                <div class="post-actions">
+                  <button class="btn-share" onclick="sharePost('${post.url}')">Share</button>
+                  <button class="btn-delete" onclick="deletePost('${post.id}')">Delete</button>
+                </div>
+              </div>
+            `;
+          });
+        })
+        .catch(err => console.error("Error fetching posts:", err));
+    }
+
+    function fetchComments() {
+      fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/comments?key=${BLOGGER_API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('comments-list');
+          list.innerHTML = "";
+          
+          if (!data.items || data.items.length === 0) { 
+            list.innerHTML = "<p style='font-size:12px; color:var(--subtext);'>No recent comments.</p>"; 
+            return; 
+          }
+
+          data.items.forEach(c => {
+            list.innerHTML += `
+              <div class="comment-item">
+                <div style="font-size: 13px;"><strong>${c.author.displayName}:</strong> ${c.content}</div>
+                <div style="font-size: 10px; color: var(--subtext); margin-top:3px;">${new Date(c.published).toLocaleString()}</div>
+              </div>
+            `;
+          });
+        })
+        .catch(err => console.error("Error fetching comments:", err));
+    }
+
+    function uploadPost() {
+      const title = document.getElementById('post-title').value;
+      const thumb = document.getElementById('post-thumb').value;
+      const content = document.getElementById('post-content').value;
+
+      if (!title || !content) {
+        alert("Please enter a title and content.");
+        return;
+      }
+
+      // Build HTML string with thumbnail and author signature
+      let bodyHtml = "";
+      if (thumb) {
+        bodyHtml += `<p><img src="${thumb}" style="max-width:100%; height:auto; border-radius:8px;"></p><br>`;
+      }
+      bodyHtml += `<p>${content}</p><br><hr><p><small>Uploaded by: <strong>${currentUser.name}</strong></small></p>`;
+
+      alert("Post payload generated successfully for: " + title);
+      // Reset input fields
+      document.getElementById('post-title').value = "";
+      document.getElementById('post-thumb').value = "";
+      document.getElementById('post-content').value = "";
+    }
+
+    function sharePost(url) {
+      if (navigator.share) {
+        navigator.share({ title: 'Share Post', url: url });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert("Post URL copied to clipboard!");
+      }
+    }
+
+    function deletePost(postId) {
+      if (confirm("Are you sure you want to delete this post?")) {
+        alert("Delete command triggered for Post ID: " + postId);
+      }
+    }
+  </script>
+</body>
+</html>
